@@ -308,14 +308,18 @@ public final class StatusManager {
     /**
      * Get status priority for sorting (lower = higher priority)
      * Handles specific order: Configured -> _OTHER_ (Undefined) ->
-     * Configured(Bottom) -> No Status
+     * Configured(Bottom). Players without a status are placed at the "_NONE_"
+     * entry; if it is not configured, they are sorted last.
      */
     public int getStatusPriority(@NotNull String statusKey) {
+        List<String> priority = sortingPriority;
+
         if (statusKey == null || statusKey.isEmpty()) {
-            return 999; // "No Status" is always last
+            // "No Status": position of _NONE_ if configured, otherwise always last
+            int noneIndex = priority.indexOf("_NONE_");
+            return noneIndex >= 0 ? noneIndex : 999;
         }
 
-        List<String> priority = sortingPriority;
         int index = priority.indexOf(statusKey.toUpperCase());
 
         if (index >= 0) {
