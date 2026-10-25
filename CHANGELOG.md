@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [7.1.6] - 2026-10-25
+
+### Added
+- `_NONE_` entry for `tablist.sorting.priority` sets the position of players without a status in the tab list. Without it they are still listed last. A commented example is in `config.yml`.
+- Players spawned by FakePlayer(-CE) are shown in italics in the tab list, like spectators. They are detected via the PlaceholderAPI placeholder `%fakeplayer_isfake%`, so this needs PlaceholderAPI and FakePlayer(-CE).
+
+### Changed
+- FakePlayer(-CE) players no longer show a death count in the tab list (`<deaths>` and `<deaths_formatted>` are empty for them).
+
+---
+
 ## [7.1.5] - 2026-10-09
 
 ### Added
