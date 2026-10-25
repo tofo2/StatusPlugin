@@ -80,13 +80,16 @@ tablist:
     # Disable this if you have issues with other scoreboard plugins.
     enabled: true
     # Priority order (first = top of list)
-    # Players without status will be after all defined statuses
+    # Players without status will be after all defined statuses,
+    # unless you add "_NONE_" to the list to choose their position
+    # (see the commented example below).
     priority:
       - "ADMIN"
       - "MOD"
       - "VIP"
       - "MEMBER"
       - "_OTHER_" # All other statuses (e.g. Building, Farming)
+      # - "_NONE_" # Players without a status (default: listed last)
       - "AFK"
       - "CAM"
 
