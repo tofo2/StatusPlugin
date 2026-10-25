@@ -506,14 +506,16 @@ public final class TabListManager {
     /**
      * Placeholders that depend on the player and are shared by the list name and
      * header/footer lines (<player> differs between the two and is added by the caller).
+     * Fake players show no death count.
      */
     @NotNull
     private TagResolver.Builder playerResolvers(@NotNull PlayerValues values) {
         return TagResolver.builder()
                 .resolver(Placeholder.component("status", values.statusDisplay()))
-                .resolver(Placeholder.unparsed("deaths", String.valueOf(values.deaths())))
+                .resolver(Placeholder.unparsed("deaths", values.fake() ? "" : String.valueOf(values.deaths())))
                 // Formatted deaths: [☠ N]
-                .resolver(Placeholder.component("deaths_formatted", deathTracker.formatDeaths(values.deaths())))
+                .resolver(Placeholder.component("deaths_formatted",
+                        values.fake() ? Component.empty() : deathTracker.formatDeaths(values.deaths())))
                 .resolver(Placeholder.unparsed("country", values.country()))
                 .resolver(Placeholder.unparsed("countrycode", values.countryCode()));
     }
