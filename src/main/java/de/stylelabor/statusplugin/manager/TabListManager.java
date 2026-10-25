@@ -38,8 +38,8 @@ public final class TabListManager {
     private static final String SORT_TEAM_PREFIX = "sp_sort_";
     private static final Pattern NON_ALPHANUMERIC = Pattern.compile("[^a-zA-Z0-9]");
 
-    // FakePlayer(-CE) sets this metadata on every fake player it spawns
-    private static final String FAKE_PLAYER_METADATA = "fakeplayer:spawned_at";
+    // PlaceholderAPI placeholder of FakePlayer(-CE): "true" for fake players
+    private static final String FAKE_PLAYER_PLACEHOLDER = "%fakeplayer_isfake%";
 
     // Tags that render differently for each player. Header/footer lines without them
     // (and without PAPI placeholders) are parsed once per refresh and shared.
@@ -495,10 +495,12 @@ public final class TabListManager {
     }
 
     /**
-     * Check if a player was spawned by the FakePlayer(-CE) plugin
+     * Check if a player was spawned by the FakePlayer(-CE) plugin. Uses its
+     * PlaceholderAPI placeholder, so this is false without PlaceholderAPI or
+     * FakePlayer(-CE).
      */
     private static boolean isFakePlayer(@NotNull Player player) {
-        return player.hasMetadata(FAKE_PLAYER_METADATA);
+        return "true".equalsIgnoreCase(PlaceholderUtil.parse(player, FAKE_PLAYER_PLACEHOLDER));
     }
 
     /**
