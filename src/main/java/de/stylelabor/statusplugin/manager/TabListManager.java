@@ -5,6 +5,7 @@ import de.stylelabor.statusplugin.config.ConfigManager;
 import de.stylelabor.statusplugin.util.ColorUtil;
 import de.stylelabor.statusplugin.util.PlaceholderUtil;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -36,6 +37,9 @@ public final class TabListManager {
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
     private static final String SORT_TEAM_PREFIX = "sp_sort_";
     private static final Pattern NON_ALPHANUMERIC = Pattern.compile("[^a-zA-Z0-9]");
+
+    // FakePlayer(-CE) sets this metadata on every fake player it spawns
+    private static final String FAKE_PLAYER_METADATA = "fakeplayer:spawned_at";
 
     // Tags that render differently for each player. Header/footer lines without them
     // (and without PAPI placeholders) are parsed once per refresh and shared.
@@ -82,7 +86,7 @@ public final class TabListManager {
      * The player-specific values that list names and header/footer lines are rendered from
      */
     private record PlayerValues(@Nullable String status, @NotNull Component statusDisplay, int deaths,
-            @NotNull String country, @NotNull String countryCode) {
+            @NotNull String country, @NotNull String countryCode, boolean fake) {
     }
 
     private record ListNameState(@NotNull PlayerValues values, @NotNull Component listName) {
@@ -408,6 +412,10 @@ public final class TabListManager {
         TagResolver.Builder resolvers = playerResolvers(values);
 
         Component playerName = Component.text(player.getName());
+        // Fake players are shown in italics, like spectators in the vanilla tab list
+        if (values.fake()) {
+            playerName = playerName.decorate(TextDecoration.ITALIC);
+        }
         if (nameColorsEnabled) {
             String rawStatus = values.status();
             if (rawStatus != null) {
@@ -482,12 +490,20 @@ public final class TabListManager {
                 statusManager.getStatusDisplay(uuid),
                 deathTracker.getDeaths(uuid),
                 countryManager.getCountry(uuid).orElse(""),
-                countryManager.getCountryCode(uuid).orElse(""));
+                countryManager.getCountryCode(uuid).orElse(""),
+                isFakePlayer(player));
+    }
+
+    /**
+     * Check if a player was spawned by the FakePlayer(-CE) plugin
+     */
+    private static boolean isFakePlayer(@NotNull Player player) {
+        return player.hasMetadata(FAKE_PLAYER_METADATA);
     }
 
     /**
      * Placeholders that depend on the player and are shared by the list name and
-     * header/footer (<player> differs between the two and is added by the caller).
+     * header/footer lines (<player> differs between the two and is added by the caller).
      */
     @NotNull
     private TagResolver.Builder playerResolvers(@NotNull PlayerValues values) {
